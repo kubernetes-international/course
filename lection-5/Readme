@@ -45,7 +45,7 @@ pipeline {
 	                    ms1 = docker.build("fourth-memento-307608/ms1","-f ./cicd/Dockerfile ./ ")
 	                }
 	                script {
-	                    docker.withRegistry('https://eu.gcr.io', 'gcr:google-container-registry') {
+	                    docker.withRegistry('https://eu.gcr.io', 'gcr:gcr-admin-key') {
 	                        ms1.push("latest")
 	                    }                    
 	                }
@@ -57,7 +57,7 @@ pipeline {
 	            }
 	            steps{
 	                script {
-	                    docker.withRegistry('https://eu.gcr.io', 'gcr:google-container-registry') {
+	                    docker.withRegistry('https://eu.gcr.io', 'gcr:gcr-admin-key') {
 	                        ms1.push("latest")
 	                    }                    
 	                }
