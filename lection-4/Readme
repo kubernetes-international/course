@@ -2,3 +2,47 @@
 Google OAuth Credentials 
 Docker Pipeline 
 Google Container Registry Auth
+
+
+2) Create a service account.
+Api -> credentials -> create 
+
+Storage -> Storage Admin & Storage Object Viewer
+
+Step 3) We have to Add Global Credential
+Jenkins -> Credentials -> Global Credentials -> Add Credentials
+Select kind : Google Service Account from private key
+Provide Project Name(which can be any thing) and click on JSON key radio button and attach json file which we already downloaded in Step 2.
+
+
+
+4)
+
+node{
+	stage('Build image') {
+	  app = docker.build("[id-of-your-project-as-in-google-url]/[name-of-the-artifact]")
+	}
+	stage('Push image') {
+	  docker.withRegistry('https://eu.gcr.io', 'gcr:[credentials-id]') {
+	    app.push("${env.BUILD_NUMBER}")
+	    app.push("latest")
+	  }
+	}
+}
+
+Example:
+node{
+    checkout scm
+    stage('Build image') {
+       app = docker.build("fourth-memento-307608/test")
+    }
+    stage('Push image') {
+        docker.withRegistry('https://eu.gcr.io', 'gcr:google-container-registry') {
+            app.push("${env.BUILD_NUMBER}")
+            app.push("latest")
+        }
+    }
+}
+
+
+
