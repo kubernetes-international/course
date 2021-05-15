@@ -1,0 +1,72 @@
+=== Goal for the lesson ====
+- Add "develop chain" logic to source code repositories  
+
+=== Plan ===
+- overview for 3 source code repositories (simple applications on node, php and python to show that this )
+- remember develop branch and see which part we are checking
+- review Dockerfile
+- review Jenkinsfile
+
+=== Instructions ===
+
+1) source code repositories
+https://github.com/kubernetes-international/ms1
+https://github.com/kubernetes-international/ms2
+https://github.com/kubernetes-international/ms3
+
+2) Dockerfile example
+
+FROM python:3.6
+COPY ./src/ /app
+WORKDIR /app
+RUN pip install -r requirements.txt
+ENTRYPOINT ["python"]
+CMD ["app.py"]
+
+
+3) Jenkinsfile example
+pipeline {
+	    agent any
+	    stages {
+	        stage("Checkout code") {
+	            steps {
+	                checkout scm
+	            }
+	        }
+	        stage('Build image') {
+	            when{
+	                anyOf{
+	                    expression{env.BRANCH_NAME == 'master'}
+	                    expression{env.BRANCH_NAME == 'develop'}
+	                }
+	            }
+	            steps{
+	                script {
+	                    ms1 = docker.build("fourth-memento-307608/ms1","-f ./cicd/Dockerfile ./ ")
+	                }
+	                script {
+	                    docker.withRegistry('https://eu.gcr.io', 'gcr:google-container-registry') {
+	                        ms1.push("latest")
+	                    }                    
+	                }
+	            }
+	        }
+	        stage('Push develop branch to GCR') {
+	            when {
+	                branch 'develop'
+	            }
+	            steps{
+	                script {
+	                    docker.withRegistry('https://eu.gcr.io', 'gcr:google-container-registry') {
+	                        ms1.push("latest")
+	                    }                    
+	                }
+	            }
+	        }
+	        stage ('Push container from develop branch to dev cluster') {
+	            steps{
+	                build job: 'deploy-to-k8s', parameters: [[$class: 'StringParameterValue', name: 'ms-name', value: 'ms1']]
+	            }    
+	        }
+	    }
+}

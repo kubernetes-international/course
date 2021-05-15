@@ -16,7 +16,7 @@ Google Container Registry Auth
 
 
 2) Create a service account.
-Api -> credentials -> create 
+APIs & Services -> credentials -> create -> Service account
 
 Storage -> Storage Admin & Storage Object Viewer
 
@@ -48,8 +48,7 @@ node{
        app = docker.build("fourth-memento-307608/test")
     }
     stage('Push image') {
-        docker.withRegistry('https://eu.gcr.io', 'gcr:google-container-registry') {
-            app.push("${env.BUILD_NUMBER}")
+        docker.withRegistry('https://eu.gcr.io', 'gcr:	gcr-admin-key') {
             app.push("latest")
         }
     }
