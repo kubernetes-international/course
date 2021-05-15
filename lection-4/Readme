@@ -1,3 +1,14 @@
+=== Goal for the lesson ====
+ connect Jenkins to GCR
+
+=== Plan ===
+- install jenkins plugins for docker
+- create account in GCP
+- add account to Jenkins
+- review build syntax
+
+=== Instructions ===
+
 1) install plugins on Jenknis
 Google OAuth Credentials 
 Docker Pipeline 
