@@ -66,7 +66,7 @@ pipeline {
 				expression{env.GIT_BRANCH == 'origin/develop'}
 			}
 			steps{
-				build job: 'deploy-to-k8s', parameters: [[$class: 'StringParameterValue', name: 'ms-name', value: 'ms1']]
+				build job: 'deploy-to-k8s'
 			}    
 		}
 	}
