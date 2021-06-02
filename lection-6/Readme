@@ -1,0 +1,114 @@
+=== Plan ===
+- understanding why we need Ingress controller(we will use nignx ingress controller) and cert-manager
+- create kubernetes cluster in GCP
+- install Ingress Controller
+- update DNS record for the domain kubernetes.coach on Domain Register
+- test Ingress Controller
+- Install Helm 3
+- Install and test cert-manager
+
+
+
+===  create kubernetes cluster in GCP
+
+
+
+=== install and test Ingress Controller
+Documentation:
+https://kubernetes.github.io/ingress-nginx/deploy/
+
+Steps:
+1. create admin clusterrole
+kubectl create clusterrolebinding cluster-admin-binding \
+  --clusterrole cluster-admin \
+  --user $(gcloud config get-value account)
+
+2. install ingress Controller
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.46.0/deploy/static/provider/cloud/deploy.yaml
+
+3. get ingress IP 
+kubectl get svc -n ingress-nginx
+
+
+
+
+
+===  update DNS record for the domain on Domain Register
+
+
+
+
+=== test Ingress Controller
+3. create test namespace
+kubectl create namespace test  
+
+4. apply 3 deployments/services/ingress with different URLs:
+kubectl apply -f lection-6/ingress/test-deployments/test1-deployment.yaml
+kubectl apply -f lection-6/ingress/test-deployments/test1-service.yaml
+kubectl apply -f lection-6/ingress/test-deployments/test1-ingress.yaml
+
+kubectl apply -f lection-6/ingress/test-deployments/test2-deployment.yaml
+kubectl apply -f lection-6/ingress/test-deployments/test2-service.yaml
+kubectl apply -f lection-6/ingress/test-deployments/test2-ingress.yaml
+
+kubectl apply -f lection-6/ingress/test-deployments/test3-deployment.yaml
+kubectl apply -f lection-6/ingress/test-deployments/test3-service.yaml
+kubectl apply -f lection-6/ingress/test-deployments/test3-ingress.yaml
+
+4. Check that domains are working:
+test1.kubernetes.coach
+test2.kubernetes.coach
+test3.kubernetes.coach
+
+
+
+
+=== Install Helm 3
+Documentation:
+https://helm.sh/docs/intro/install/
+
+MacOs:
+brew install helm
+
+Debian/Ubuntu:
+curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
+sudo apt-get install apt-transport-https --yes
+echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+sudo apt-get update
+sudo apt-get install helm
+
+
+
+=== Install and test cert-manager
+Documentation:
+https://cert-manager.io/docs/installation/kubernetes/
+
+Steps:
+1. create namesapce for cert-manager:
+kubectl create namespace cert-manager
+
+2. add helm repo:
+helm repo add jetstack https://charts.jetstack.io
+helm repo update
+
+3. Install cert-manager with helm:
+ helm install \
+  cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --create-namespace \
+  --version v1.3.1 \
+  --set installCRDs=true
+
+4. Verifying the installation 
+kubectl get pods --namespace cert-manager
+
+5. Install cluster issuer:
+kubectl apply -f lection-6/cert-manager/cluster-issuer/issuer.yaml
+
+6. Apply the deployment the deployment:
+kubectl apply -f lection-6/cert-manager/test-deployment/deployment-ssl.yaml
+kubectl apply -f lection-6/cert-manager/test-deployment/service-ssl.yaml
+kubectl apply -f lection-6/cert-manager/test-deployment/ingress-ssl.yaml
+
+7. Test in browser:
+https://ssl-test.kubernetes.coach
