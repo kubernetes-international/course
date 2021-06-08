@@ -25,3 +25,8 @@ spec:
         backend:
           serviceName: ssl-test-service
           servicePort: 80
+      - path: /
+        backend:
+          serviceName: ssl-test-service
+          servicePort: 443
+
